@@ -49,8 +49,18 @@ augeas { "interfaces":
         require => Package["bridge-utils"]
 }
 
-exec { "networking-restart":
-	command => "/etc/init.d/networking restart",
+exec { "eth0-down":
+	command => "/sbin/ifdown eth0",
 	subscribe => Augeas["interfaces"]
+}
+
+exec { "eth0-up":
+        command => "/sbin/ifup eth0",
+        subscribe => Exec["eth0-down"]
+}
+
+exec { "br0-up":
+        command => "/sbin/ifup br0",
+        subscribe => Exec["eth0-up"]
 }
 
