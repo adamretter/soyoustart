@@ -86,7 +86,7 @@ mem         = 4096
 cpus        = 2
 
 [ubuntu]
-suite         = utopic
+suite         = vivid
 flavour       = virtual
 components    = main,universe
 addpkg        = openssh-server, git, vim, puppet"
