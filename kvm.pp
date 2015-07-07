@@ -64,3 +64,31 @@ exec { "br0-up":
         subscribe => Exec["eth0-up"]
 }
 
+file { "/etc/vmbuild.cfg":
+	require => Package["ubuntu-vm-builder"],
+	content => "[DEFAULT]
+arch   = amd64
+domain = evolvedbinary.com
+mask   = 255.255.255.255
+net    = 5.196.205.132
+bcast  = 5.196.205.132
+gw     = 91.121.89.254
+dns    = 213.186.33.99
+user   = aretter
+name   = Adam Retter
+pass   = changeme
+
+[kvm]
+libvirt     = qemu:///system
+bridge      = br0
+virtio_net  = true
+mem         = 4096
+cpus        = 2
+
+[ubuntu]
+suite         = utopic
+flavour       = virtual
+components    = main,universe
+addpkg        = openssh-server, git, vim, puppet"
+}
+
