@@ -64,15 +64,13 @@ exec { "br0-up":
         subscribe => Exec["eth0-up"]
 }
 
-file { "/etc/vmbuild.cfg":
+file { "/etc/vmbuilder.cfg":
 	require => Package["ubuntu-vm-builder"],
 	content => "[DEFAULT]
 arch   = amd64
 domain = evolvedbinary.com
 mask   = 255.255.255.255
-net    = 5.196.205.132
 bcast  = 5.196.205.132
-gw     = 91.121.89.254
 dns    = 213.186.33.99
 user   = aretter
 name   = Adam Retter
@@ -86,9 +84,10 @@ mem         = 4096
 cpus        = 2
 
 [ubuntu]
-suite         = vivid
-flavour       = virtual
-components    = main,universe
-addpkg        = openssh-server, git, vim, puppet"
+suite = trusty
+flavour = virtual
+components = main,universe
+mirror = http://91.121.125.139/ftp.ubuntu.com/ubuntu
+addpkg = openssh-server, git, vim, puppet, acpid, linux-image-generic"
 }
 
