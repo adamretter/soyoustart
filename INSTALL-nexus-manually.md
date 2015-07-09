@@ -49,24 +49,43 @@ systemctl enable nexus
 systemctl start nexus
 
 
+*** Proxying
+Edit the file /opt/nexus/conf/nexus.properties and set:
+
+nexus-webapp-context-path=/
+
+
+Also see http://books.sonatype.com/nexus-book/reference/install-sect-proxy.html
+
 sudo apt-get install nginx
 sudo rm /etc/nginx/sites-enabled/default
 
 Create the file /etc/nginx/sites-available/repo.evolvedbinary.com:
 
 server {
-	listen 80;
-	listen [::]:80;
+        listen 80;
+        listen [::]:80;
 
-	server_name repo.evolvedbinary.com;
+        server_name repo.evolvedbinary.com;
 
-	charset utf-8;
+        charset utf-8;
         access_log /var/log/nginx/repo.evolvedbinary.com_access.log;
 
+	client_max_body_size 99M;
+
         location / {
-            proxy_pass http://localhost:8081/nexus/;
+            proxy_pass http://localhost:8081;
+            proxy_send_timeout 120;
+            proxy_read_timeout 300;
+            proxy_buffering off;
+            keepalive_timeout 5;
+            tcp_nodelay on;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 }
+
 
 Edit /etc/nginx/nginx.conf and set:
 
