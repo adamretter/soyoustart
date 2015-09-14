@@ -11,13 +11,16 @@ http://serverfault.com/questions/338770/kvm-on-ubuntu-console-connection-display
 
 2) Make sure the default gateway is specified in the guest's /etc/network/interfaces using post-up and pre-down and NOT `gateway`, i.e. these lines should be present on eth0:
 
+```
         post-up /sbin/route add 91.121.89.254 dev eth0
         post-up /sbin/route add default gw 91.121.89.254
         pre-down /sbin/route del 91.121.89.254 dev eth0
         pre-down /sbin/route del default gw 91.121.89.254
+```
 
 So the config should look like:
 
+```
 auto eth0
 iface eth0 inet static
         address 5.196.205.132
@@ -30,7 +33,7 @@ iface eth0 inet static
         pre-down /sbin/route del default gw 91.121.89.254
         dns-search evolvedbinary.com
         dns-nameservers 213.186.33.99
-
+```
 
 
 TODO - consider using -- Puppet master and puppet agent to setup the serial port and routes by using a on firstboot script with kvm which calls puppet, e.g. http://pebblecode.com/blog/building-armies-of-servers-with-kvm-and-puppet/
