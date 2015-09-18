@@ -82,6 +82,7 @@ bridge      = br0
 virtio_net  = true
 mem         = 4096
 cpus        = 2
+rootsize    = 20480
 
 [ubuntu]
 suite = trusty
