@@ -6,6 +6,33 @@ vmbuilder kvm ubuntu --suite trusty --mirror http://91.121.125.139/ftp.ubuntu.co
 
 1) Then you need to add serial tty to the guest to allow access via `virsh console`. Do this by connecting via vnc+ssh or editing the image file directly. See:
 
+virsh edit your-guest
+Add the line in the `devices` section:
+
+<console type='pty'>
+  <target port='0'/>
+</console>
+
+
+virsh vncdisplay your-guest
+ssh -L 5901:localhost:5901 this-physical-server
+Connect via vncviewer to the guest
+Create the file /etc/init/ttyS0.conf:
+
+```
+# ttyS0 - getty
+#
+# This service maintains a getty on ttyS0 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc RUNLEVEL=[2345]
+stop on runlevel [!2345]
+
+respawn
+exec /sbin/getty -L 115200 ttyS0 xterm
+```
+
+
 https://help.ubuntu.com/community/KVM/Access
 http://serverfault.com/questions/338770/kvm-on-ubuntu-console-connection-displays-nothing
 
