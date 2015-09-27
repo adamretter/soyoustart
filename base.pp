@@ -35,9 +35,13 @@ exec { "git-email":
 }
 
 # install java 8
+package { "software-properties-common":
+	ensure => installed
+}
 
 exec { "webupd8-java-repo":
 	command => "/usr/bin/add-apt-repository ppa:webupd8team/java",
+	require => Package["software-properties-common"]
 }
 
 exec { "apt-update":
