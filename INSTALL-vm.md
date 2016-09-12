@@ -6,12 +6,14 @@ vmbuilder kvm ubuntu --suite trusty --mirror http://91.121.125.139/ftp.ubuntu.co
 
 1) Then you need to add serial tty to the guest to allow access via `virsh console`. Do this by connecting via vnc+ssh or editing the image file directly. See:
 
-virsh edit your-guest
+`virsh edit your-guest`
 Add the line in the `devices` section:
 
+```xml
 <console type='pty'>
   <target port='0'/>
 </console>
+```
 
 
 virsh vncdisplay your-guest
