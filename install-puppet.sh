@@ -2,5 +2,5 @@
 apt-get install puppet augeas-tools
 
 # stop the puppet agent, we are going to use puppet apply
-update-rc.d puppet disable
+systemctl disable puppet
 service puppet stop 
