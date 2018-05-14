@@ -19,6 +19,9 @@ Add the line in the `devices` section:
 virsh vncdisplay your-guest
 ssh -L 5901:localhost:5901 this-physical-server
 Connect via vncviewer to the guest
+
+default login is aretter/changeme
+
 Create the file /etc/init/ttyS0.conf:
 
 ```
