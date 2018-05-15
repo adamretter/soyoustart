@@ -2,7 +2,7 @@ Request a Virtual MAC from the SoYouStart control panel for your new ip address,
 
 Run -
 
-vmbuilder kvm ubuntu --suite trusty --mirror http://91.121.125.139/ftp.ubuntu.com/ubuntu --dest /vm/artifacts --rootsize 20480 --mac 02:00:00:12:51:ce --hostname artifacts --ip 5.196.205.132 --mask 255.255.255.255 --dns 213.186.33.99 --bridge br0 --addpkg linux-image-generic --addpkg acpid --addpkg openssh-server --libvirt qemu:///system
+vmbuilder --verbose kvm ubuntu --suite xenial --mirror http://213.32.5.7/ubuntu/ubuntu --dest /vm/your-guest-name --rootsize 40960 --mac 02:00:00:89:26:be --hostname your-guest-name --ip 54.36.67.136 --mask 255.255.255.255 --dns 213.186.33.99 --bridge br0 --addpkg linux-image-generic --addpkg acpid --addpkg openssh-server --libvirt qemu:///system
 
 1) Then you need to add serial tty to the guest to allow access via `virsh console`. Do this by connecting via vnc+ssh or editing the image file directly. See:
 
