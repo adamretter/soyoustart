@@ -3,17 +3,17 @@ Request a Virtual MAC from the SoYouStart control panel for your new ip address,
 Run -
 
 ```bash
-$ vmbuilder --verbose kvm ubuntu --suite xenial --mirror http://213.32.5.7/ubuntu/ubuntu --dest /vm/your-guest-name --rootsize 40960 --mac 02:00:00:89:26:be --hostname your-guest-name --ip 54.36.67.136 --mask 255.255.255.255 --dns 213.186.33.99 --bridge br0 --addpkg linux-image-generic --addpkg acpid --addpkg openssh-server --libvirt qemu:///system
+$ sudo vmbuilder --verbose kvm ubuntu --suite xenial --mirror http://213.32.5.7/ubuntu/ubuntu --dest /vm/your-guest-name --rootsize 40960 --mac 02:00:00:89:26:be --hostname your-guest-name --ip 54.36.67.136 --mask 255.255.255.255 --dns 213.186.33.99 --bridge br0 --addpkg linux-image-generic --addpkg acpid --addpkg openssh-server --add-pkg screen --libvirt qemu:///system
 ```
 
 ```bash
-virsh autostart your-guest
+$ sudo virsh autostart your-guest
 ```
 
 1) Then you need to add serial tty to the guest to allow access via `virsh console`. Do this by connecting via vnc+ssh or editing the image file directly. See:
 
 ```bash
-virsh edit your-guest
+$ sudo virsh edit your-guest
 ```
 
 Add the line in the `devices` section:
@@ -25,23 +25,25 @@ Add the line in the `devices` section:
 ```
 
 ```bash
-virsh start your-guest
+$ sudo virsh start your-guest
 ```
 
 
 ```bash
-virsh vncdisplay your-guest
+$ sudo virsh vncdisplay your-guest
 ```
 
 Note the VNC Port number, you should use it as part of the port number in the ssh forwarding below. e.g. if the VNC port number is `3` you should forward the port `5903`.
 
 From the remote client:
-ssh -L 5901:localhost:5901 this-physical-server
+```bash
+$ ssh -L 5901:localhost:5901 this-physical-server
+```
 Connect via vncviewer to the guest
 
 default login is aretter/changeme
 
-Create the file /etc/init/ttyS0.conf:
+Create the file `/etc/init/ttyS0.conf`:
 
 ```
 # ttyS0 - getty
@@ -62,12 +64,12 @@ You will need to restart for the above to take effect.
 https://help.ubuntu.com/community/KVM/Access
 http://serverfault.com/questions/338770/kvm-on-ubuntu-console-connection-displays-nothing
 
-2) Make sure the default gateway is specified in the guest's /etc/network/interfaces using post-up and pre-down and NOT `gateway`, i.e. these lines should be present on eth0:
+2) Make sure the default gateway is specified in the guest's `/etc/network/interfaces` using post-up and pre-down and NOT `gateway`, i.e. these lines should be present on eth0:
 
 ```
-        post-up /sbin/route add 91.121.89.254 dev eth0
+        post-up /sbin/route add 91.121.89.254 dev ens3
         post-up /sbin/route add default gw 91.121.89.254
-        pre-down /sbin/route del 91.121.89.254 dev eth0
+        pre-down /sbin/route del 91.121.89.254 dev ens3
         pre-down /sbin/route del default gw 91.121.89.254
 ```
 
@@ -111,7 +113,7 @@ sudo apt-get update && apt-get upgrade && apt-get dist-upgrade
 sudo apt-get install update-manager-core
 ```
 
-Change `lts` to `normal` in /etc/update-manager/release-upgrades
+Change `lts` to `normal` in `/etc/update-manager/release-upgrades`
 
 ```bash
 sudo do-release-upgrade -d
