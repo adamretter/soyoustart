@@ -3,7 +3,7 @@ Request a Virtual MAC from the SoYouStart control panel for your new ip address,
 Run -
 
 ```bash
-$ sudo vmbuilder --verbose kvm ubuntu --suite xenial --mirror http://213.32.5.7/ubuntu/ubuntu --dest /vm/your-guest-name --rootsize 40960 --mac 02:00:00:89:26:be --hostname your-guest-name --ip 54.36.67.136 --mask 255.255.255.255 --dns 213.186.33.99 --bridge br0 --addpkg linux-image-generic --addpkg acpid --addpkg openssh-server --add-pkg screen --libvirt qemu:///system
+$ sudo vmbuilder --verbose kvm ubuntu --suite xenial --mirror http://ubuntu.mirrors.ovh.net/ubuntu --dest /vm/your-guest-name --rootsize 40960 --mac 02:00:00:89:26:be --hostname your-guest-name --ip 54.36.67.136 --mask 255.255.255.255 --dns 213.186.33.99 --bridge br0 --addpkg linux-image-generic --addpkg acpid --addpkg opensshserver --addpkg ufw --addpkg screen --libvirt qemu:///system
 ```
 
 ```bash
