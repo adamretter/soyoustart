@@ -152,7 +152,7 @@ ethernets:
           scope: link
 EOL
 
-ssh-keygen -b 4096 -f $SSH_KEY
+ssh-keygen -b 4096 -C "ubuntu@${HOSTNAME}" -f $SSH_KEY
 
 uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --mac $MAC --packages language-pack-en,openssh-server,mosh,git,vim,puppet,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch="amd64" release=$RELEASE label="minimal release"
 
