@@ -4,12 +4,12 @@
 2. Update to the latest Ubuntu Cloud Images
     ```bash
     sudo uvt-simplestreams-libvirt sync arch=amd64 release=bionic
-    sudo uvt-simplestreams-libvirt sync --source=http://cloud-images.ubuntu.com/minimal/release arch=amd64 release=bionic
+    sudo uvt-simplestreams-libvirt sync --source=http://cloud-images.ubuntu.com/minimal/releases arch=amd64 release=bionic
     ```
 
 3. Run this script to create the VM:
     ```bash
-    sudo ./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release bionic --memory 4096 --disk 40 --cpu 2 --bridge br0 --mac 06:00:00:42:9b:44  --ip 123.123.123.123 --gateway 91.121.89.254 --dns 213.186.33.99 --dns-search evolvedbinary.com
+    sudo ./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release bionic --memory 4096 --disk 40 --cpu 2 --bridge br0 --mac 06:00:00:42:9b:44  --ip 123.123.123.123 --network 54.36.67.139 --mask 255.255.255.255 --broadcast 5.196.205.132 --gateway 91.121.89.254 --dns 213.186.33.99 --dns-search evolvedbinary.com
     ```
 4. Connect to the new VM:
     ```bash
