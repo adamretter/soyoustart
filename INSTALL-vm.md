@@ -8,7 +8,7 @@
 
 3. Run this script to create the VM:
     ```bash
-    sudo ./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release focal --memory 4096 --disk 40 --cpu 2 --bridge br0 --ip 123.123.123.123 --gateway 91.121.89.254 --dns 213.133.100.100 --dns-search evolvedbinary.com
+    sudo ./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release focal --memory 4096 --disk 40 --cpu 2 --bridge br0 --ip 123.123.123.123 --gateway 91.121.89.254 --dns 213.133.100.100 --dns-search evolvedbinary.com --auto-start
     ```
 4. Connect to the new VM:
     ```bash

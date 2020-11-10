@@ -3,6 +3,8 @@
 set -e
 set -x
 
+AUTOSTART="false"
+
 POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
@@ -57,6 +59,10 @@ case $key in
     --dns-search)
     DNSSEARCH+=("$2")
     shift
+    shift
+    ;;
+    --auto-start)
+    AUTOSTART="true"
     shift
     ;;
     -h|--help)
@@ -137,5 +143,9 @@ uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK 
 
 # NOTE: uvt-kvm wait does not work with bridge as it cannot detect the IP
 #uvt-kvm wait $HOSTNAME --insecure
+
+if [[ "${AUTOSTART}" -eq "true" ]]; then
+	sudo virsh autostart $HOSTNAME
+fi
 
 rm $METADATA_FILE
