@@ -126,7 +126,7 @@ done
 cat > $NETWORK_CONFIG_FILE << EOL
 version: 2
 ethernets:
-  ens3:
+  enp1s0:
     addresses:
       - ${IP}/28
     gateway4: ${GATEWAY}
