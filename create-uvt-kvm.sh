@@ -21,6 +21,11 @@ case $key in
     shift
     shift
     ;;
+    --password)
+    PASSWORD="$2"
+    shift
+    shift
+    ;;
     --memory)
     MEMORY="$2"
     shift
@@ -139,7 +144,12 @@ EOL
 
 ssh-keygen -b 4096 -C "ubuntu@${HOSTNAME}" -f $SSH_KEY
 
-uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,puppet,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch="amd64" release=$RELEASE label="minimal release"
+if [ -z ${PASSWORD+x} ]; then
+	uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,puppet,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch="amd64" release=$RELEASE label="minimal release"
+else
+	uvt-kvm create --password $PASSWORD --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,puppet,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch="amd64" release=$RELEASE label="minimal release"
+fi
+
 
 # NOTE: uvt-kvm wait does not work with bridge as it cannot detect the IP
 #uvt-kvm wait $HOSTNAME --insecure
