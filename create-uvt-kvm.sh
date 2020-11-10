@@ -145,7 +145,7 @@ uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK 
 #uvt-kvm wait $HOSTNAME --insecure
 
 if [[ "${AUTOSTART}" -eq "true" ]]; then
-	sudo virsh autostart $HOSTNAME
+	virsh autostart $HOSTNAME
 fi
 
 rm $METADATA_FILE
