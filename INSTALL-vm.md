@@ -9,14 +9,14 @@
 
 3. Run this script to create the VM:
     ```bash
-    sudo ./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release bionic --memory 4096 --disk 40 --cpu 2 --bridge br0 --mac 06:00:00:42:9b:44  --ip 123.123.123.123 --network 54.36.67.139 --mask 255.255.255.255 --broadcast 5.196.205.132 --gateway 91.121.89.254 --dns 213.186.33.99 --dns-search evolvedbinary.com
+    sudo ./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release bionic --memory 4096 --disk 40 --cpu 2 --bridge br0 --mac 06:00:00:42:9b:44  --ip 123.123.123.123 --network 54.36.67.139 --mask 255.255.255.255 --broadcast 5.196.205.132 --gateway 91.121.89.254 --dns 213.186.33.99 --dns-search evolvedbinary.com --auto-start
     ```
 4. Connect to the new VM:
     ```bash
     ssh -i /root/kvm-keys/YOUR-GUEST-NAME ubuntu@123.123.123.123
     ```
 
-5) Update the VM to the latest packages etc (inside the VM):
+5. Update the VM to the latest packages etc (inside the VM):
     ```bash
     sudo apt-get update && apt-get upgrade && apt-get dist-upgrade
     sudo apt-get autoremove --purge
