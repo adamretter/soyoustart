@@ -3,8 +3,8 @@
 
 2. Update to the latest Ubuntu Cloud Images
     ```bash
-    sudo uvt-simplestreams-libvirt sync arch=amd64 release=bionic
-    sudo uvt-simplestreams-libvirt sync --source=http://cloud-images.ubuntu.com/minimal/releases arch=amd64 release=bionic
+    sudo uvt-simplestreams-libvirt sync arch=amd64 release=focal
+    sudo uvt-simplestreams-libvirt sync --source=http://cloud-images.ubuntu.com/minimal/releases arch=amd64 release=focal
     ```
 
 3. Run this script to create the VM:
