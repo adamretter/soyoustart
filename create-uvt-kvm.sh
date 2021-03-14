@@ -51,8 +51,18 @@ case $key in
     shift
     shift
     ;;
+    --ip6)
+    IP6="$2"
+    shift
+    shift
+    ;;
     --gateway)
     GATEWAY="$2"
+    shift
+    shift
+    ;;
+    --gateway6)
+    GATEWAY6="$2"
     shift
     shift
     ;;
@@ -85,7 +95,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 if [ -n "${HELP}" ]
 then
-	echo "./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release focal --memory 4096 --disk 40 --cpu 2 --bridge br0 --ip 5.9.162.241 --broadcast 5.9.162.255 --gateway 148.251.189.87 --dns 213.133.100.100 --dns-search evolvedbinary.com"
+	echo "./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release focal --memory 4096 --disk 40 --cpu 2 --bridge virbr1 --ip 5.9.162.242 --ip6 2a01:4f8:211:ad5::4 --gateway 148.251.189.87 --gateway6 2a01:4f8:211:ad5::2 --dns 213.133.100.100 --dns-search evolvedbinary.com"
 	exit 0;
 fi
 
@@ -128,17 +138,20 @@ version: 2
 ethernets:
   enp1s0:
     addresses:
-      - ${IP}/28
-    gateway4: ${GATEWAY}
+      - ${IP}/32
+      - ${IP6}/64
     nameservers:
       addresses:
 ${DNS_LINES}
       search:
 ${DNSSEARCH_LINES}
     routes:
-      - to: ${GATEWAY}/32
-        via: 0.0.0.0
-        scope: link
+      - to: 0.0.0.0/0
+        via: ${GATEWAY}
+        on-link: true
+      - to: "::/0"
+        via: "${GATEWAY6}"
+        on-link: true
 EOL
 
 
