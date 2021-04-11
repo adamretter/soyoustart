@@ -76,6 +76,21 @@ case $key in
     shift
     shift
     ;;
+    --private-bridge)
+    PRIVATE_BRIDGE="$2"
+    shift
+    shift
+    ;;
+    --private-ip)
+    PRIVATE_IP="$2"
+    shift
+    shift
+    ;;
+    --private-gateway)
+    PRIVATE_GATEWAY="$2"
+    shift
+    shift
+    ;;
     --auto-start)
     AUTOSTART="true"
     shift
@@ -95,7 +110,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 if [ -n "${HELP}" ]
 then
-	echo "./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release focal --memory 4096 --disk 40 --cpu 2 --bridge virbr1 --ip 5.9.162.242 --ip6 2a01:4f8:211:ad5::4 --gateway 148.251.189.87 --gateway6 2a01:4f8:211:ad5::2 --dns 213.133.100.100 --dns-search evolvedbinary.com"
+	echo "./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release focal --memory 4096 --disk 40 --cpu 2 --bridge virbr1 --ip 5.9.162.242 --ip6 2a01:4f8:211:ad5::4 --gateway 148.251.189.87 --gateway6 2a01:4f8:211:ad5::2 --dns 213.133.100.100 --dns-search evolvedbinary.com --private-bridge virbr2 --private-ip 10.0.2.123 --private-gateway 10.0.2.254"
 	exit 0;
 fi
 
@@ -133,7 +148,35 @@ for i in ${!DNSSEARCH[@]}; do
         fi
 done
 
-cat > $NETWORK_CONFIG_FILE << EOL
+if [ -n "${PRIVATE_BRIDGE}" ]; then
+        cat > $NETWORK_CONFIG_FILE << EOL
+version: 2
+ethernets:
+  enp1s0:
+    addresses:
+      - ${IP}/32
+      - ${IP6}/64
+    nameservers:
+      addresses:
+${DNS_LINES}
+      search:
+${DNSSEARCH_LINES}
+    routes:
+      - to: 0.0.0.0/0
+        via: ${GATEWAY}
+        on-link: true
+      - to: "::/0"
+        via: "${GATEWAY6}"
+        on-link: true
+  enp7s0:
+    addresses:
+      - ${PRIVATE_IP}/24
+    routes:
+      - to: 10.0.1.254/32
+        via: ${PRIVATE_GATEWAY}
+EOL
+else
+	cat > $NETWORK_CONFIG_FILE << EOL
 version: 2
 ethernets:
   enp1s0:
@@ -153,7 +196,7 @@ ${DNSSEARCH_LINES}
         via: "${GATEWAY6}"
         on-link: true
 EOL
-
+fi
 
 ssh-keygen -b 4096 -C "ubuntu@${HOSTNAME}" -f $SSH_KEY
 
@@ -166,6 +209,10 @@ fi
 
 # NOTE: uvt-kvm wait does not work with bridge as it cannot detect the IP
 #uvt-kvm wait $HOSTNAME --insecure
+
+if [ -n "${PRIVATE_BRIDGE}" ]; then
+	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_BRIDGE} --model virtio --config --live
+fi
 
 if [[ "${AUTOSTART}" -eq "true" ]]; then
 	virsh autostart $HOSTNAME
