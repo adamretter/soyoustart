@@ -86,6 +86,21 @@ case $key in
     shift
     shift
     ;;
+    --private-bridge)
+    PRIVATE_BRIDGE="$2"
+    shift
+    shift
+    ;;
+    --private-ip)
+    PRIVATE_IP="$2"
+    shift
+    shift
+    ;;
+    --private-gateway)
+    PRIVATE_GATEWAY="$2"
+    shift
+    shift
+    ;;
     --auto-start)
     AUTOSTART="true"
     shift
@@ -105,7 +120,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 if [ -n "${HELP}" ]
 then
-	echo "./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release bionic --memory 4096 --disk 40 --cpu 2 --bridge br0 --mac 02:00:00:42:9b:84  --ip 54.36.67.139 --network 54.36.67.139 --mask 255.255.255.255 --broadcast 5.196.205.132 --gateway 91.121.89.254 --dns 213.186.33.99 --dns-search evolvedbinary.com"
+	echo "./create-uvt-kvm.sh --hostname YOUR-GUEST-NAME --release bionic --memory 4096 --disk 40 --cpu 2 --bridge virbr1 --mac 02:00:00:42:9b:84  --ip 54.36.67.139 --network 54.36.67.139 --mask 255.255.255.255 --broadcast 5.196.205.132 --gateway 91.121.89.254 --dns 213.186.33.99 --dns-search evolvedbinary.com --private-bridge virbr2 --private-ip 10.0.2.123 --private-gateway 10.0.2.254"
 	exit 0;
 fi
 
@@ -142,7 +157,35 @@ instance-id: ${ID}
 local-hostname: ${HOSTNAME}
 EOL
 
-cat > $NETWORK_CONFIG_FILE << EOL
+if [ -n "${PRIVATE_BRIDGE}" ]; then
+        cat > $NETWORK_CONFIG_FILE << EOL
+version: 2
+ethernets:
+    ens3:
+        addresses:
+        - ${IP}/32
+        gateway4: ${GATEWAY}
+        match:
+            macaddress: ${MAC}
+        nameservers:
+            addresses:
+            - ${DNS}
+            search:
+            - ${DNSSEARCH}
+        set-name: ens3
+        routes:
+        - to: ${GATEWAY}/32
+          via: 0.0.0.0
+          scope: link
+    enp7s0:
+        addresses:
+        - ${PRIVATE_IP}/24
+        routes:
+        - to: 10.0.1.254/32
+          via: ${PRIVATE_GATEWAY}
+EOL
+else
+	cat > $NETWORK_CONFIG_FILE << EOL
 version: 2
 ethernets:
     ens3:
@@ -162,6 +205,7 @@ ethernets:
           via: 0.0.0.0
           scope: link
 EOL
+fi
 
 ssh-keygen -b 4096 -C "ubuntu@${HOSTNAME}" -f $SSH_KEY
 
@@ -173,6 +217,10 @@ fi
 
 # NOTE: uvt-kvm wait does not work with bridge as it cannot detect the IP
 #uvt-kvm wait $HOSTNAME --insecure
+
+if [ -n "${PRIVATE_BRIDGE}" ]; then
+	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_BRIDGE} --model virtio --config --live
+fi
 
 if [[ "${AUTOSTART}" -eq "true" ]]; then
 	virsh autostart $HOSTNAME
