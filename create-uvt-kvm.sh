@@ -99,7 +99,7 @@ then
 fi
 
 
-SSH_KEY="/root/kvm-keys/${HOSTNAME}"
+SSH_KEY="/home/ubuntu/kvm/kvm-keys/${HOSTNAME}"
 ID=$(uuidgen)
 METADATA_FILE="/tmp/${ID}-meta-data"
 NETWORK_CONFIG_FILE="/tmp/${ID}-network-config"
