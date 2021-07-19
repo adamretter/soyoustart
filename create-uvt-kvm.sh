@@ -100,7 +100,7 @@ then
 fi
 
 
-SSH_KEY="/home/aretter/kvm-keys/${HOSTNAME}"
+SSH_KEY="/home/aretter/kvm/kvm-keys/${HOSTNAME}"
 ID=$(uuidgen)
 METADATA_FILE="/tmp/${ID}-meta-data"
 NETWORK_CONFIG_FILE="/tmp/${ID}-network-config"
