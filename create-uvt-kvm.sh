@@ -3,6 +3,7 @@
 set -e
 set -x
 
+ARCH="amd64"
 AUTOSTART="false"
 
 POSITIONAL=()
@@ -11,6 +12,11 @@ do
 key="$1"
 
 case $key in
+    --arch)
+    ARCH="$2"
+    shift
+    shift
+    ;;
     --release)
     RELEASE="$2"
     shift
@@ -201,9 +207,9 @@ fi
 ssh-keygen -b 4096 -C "ubuntu@${HOSTNAME}" -f $SSH_KEY
 
 if [ -z ${PASSWORD+x} ]; then
-	uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,puppet,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch="amd64" release=$RELEASE label="minimal release"
+	uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,puppet,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch=$ARCH release=$RELEASE label="minimal release"
 else
-	uvt-kvm create --password $PASSWORD --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,puppet,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch="amd64" release=$RELEASE label="minimal release"
+	uvt-kvm create --password $PASSWORD --ssh-public-key-file $SSH_KEY.pub --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,puppet,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch=$ARCH release=$RELEASE label="minimal release"
 fi
 
 
