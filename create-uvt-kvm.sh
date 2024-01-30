@@ -128,6 +128,7 @@ fi
 
 
 SSH_KEY="${HOME}/kvm/kvm-keys/${HOSTNAME}"
+SH_FILE="${HOME}/kvm/${HOSTNAME}.sh"
 ID=$(uuidgen)
 METADATA_FILE="/tmp/${ID}-meta-data"
 NETWORK_CONFIG_FILE="/tmp/${ID}-network-config"
@@ -211,6 +212,10 @@ EOL
 fi
 
 ssh-keygen -b 4096 -C "ubuntu@${HOSTNAME}" -f $SSH_KEY
+chgrp sysops $SSH_KEY $SSH_KEY.pub
+chmod 600 $SSH_KEY
+chmod 644 $SSH_KEY.pub
+
 
 if [ -z ${PASSWORD+x} ]; then
 	uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --guest-arch $ARCH --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch=$ARCH release=$RELEASE label="$LABEL"
@@ -229,5 +234,11 @@ fi
 if [[ "${AUTOSTART}" -eq "true" ]]; then
 	virsh autostart $HOSTNAME
 fi
+
+cat > $SH_FILE <<EOL
+ssh -i kvm-keys/${HOSTNAME} ubuntu@${IP}
+EOL
+chgrp sysops $SH_FILE
+chmod 770 $SH_FILE
 
 rm $METADATA_FILE
