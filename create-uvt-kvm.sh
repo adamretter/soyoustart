@@ -167,7 +167,7 @@ ethernets:
   enp1s0:
     addresses:
       - ${IP}/32
-      - ${IP6}/64
+      - ${IP6}/128
     nameservers:
       addresses:
 ${DNS_LINES}
@@ -194,7 +194,7 @@ ethernets:
   enp1s0:
     addresses:
       - ${IP}/32
-      - ${IP6}/64
+      - ${IP6}/128
     nameservers:
       addresses:
 ${DNS_LINES}
