@@ -486,9 +486,16 @@ if [[ "${AUTOSTART}" -eq "true" ]]; then
 	virsh autostart $HOSTNAME
 fi
 
-cat > $SH_FILE <<EOL
+if [ -n "${IP}" ]; then
+  cat > $SH_FILE <<EOL
 ssh -i kvm-keys/${HOSTNAME} ubuntu@${IP}
 EOL
+elif [ -n "${IP6}" ]; then
+  cat > $SH_FILE <<EOL
+ssh -i kvm-keys/${HOSTNAME} ubuntu@${IP6}
+EOL
+fi
+
 chgrp sysops $SH_FILE
 chmod 770 $SH_FILE
 
