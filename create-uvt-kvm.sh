@@ -5,6 +5,7 @@ set -x
 
 ARCH="amd64"
 LABEL="minimal release"
+CPU_MODEL="host-model"
 AUTOSTART="false"
 
 POSITIONAL=()
@@ -45,6 +46,11 @@ case $key in
     ;;
     --disk)
     DISK="$2"
+    shift
+    shift
+    ;;
+    --cpu-model)
+    CPU_MODEL="$2"
     shift
     shift
     ;;
@@ -391,9 +397,9 @@ chmod 644 $SSH_KEY.pub
 
 
 if [ -z ${PASSWORD+x} ]; then
-	uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --guest-arch $ARCH --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch=$ARCH release=$RELEASE label="$LABEL"
+	uvt-kvm create --ssh-public-key-file $SSH_KEY.pub --guest-arch $ARCH --memory $MEMORY --disk $DISK --cpu-model $CPU_MODEL --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch=$ARCH release=$RELEASE label="$LABEL"
 else
-	uvt-kvm create --password $PASSWORD --ssh-public-key-file $SSH_KEY.pub --guest-arch $ARCH --memory $MEMORY --disk $DISK --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch=$ARCH release=$RELEASE label="$LABEL"
+	uvt-kvm create --password $PASSWORD --ssh-public-key-file $SSH_KEY.pub --guest-arch $ARCH --memory $MEMORY --disk $DISK --cpu-model $CPU_MODEL --cpu $CPU --bridge $BRIDGE --packages language-pack-en,openssh-server,mosh,git,vim,screen,ufw --meta-data $METADATA_FILE --network-config $NETWORK_CONFIG_FILE $HOSTNAME arch=$ARCH release=$RELEASE label="$LABEL"
 fi
 
 
