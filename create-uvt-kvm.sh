@@ -123,6 +123,16 @@ case $key in
     shift
     shift
     ;;
+    --private-1-dns)
+    PRIVATE_1_DNS+=("$2")
+    shift
+    shift
+    ;;
+    --private-1-dns-search)
+    PRIVATE_1_DNSSEARCH+=("$2")
+    shift
+    shift
+    ;;
     --private-2-bridge)
     PRIVATE_2_BRIDGE="$2"
     shift
@@ -155,6 +165,16 @@ case $key in
     ;;
     --private-2-gateway6)
     PRIVATE_2_GATEWAY6="$2"
+    shift
+    shift
+    ;;
+    --private-2-dns)
+    PRIVATE_2_DNS+=("$2")
+    shift
+    shift
+    ;;
+    --private-2-dns-search)
+    PRIVATE_2_DNSSEARCH+=("$2")
     shift
     shift
     ;;
@@ -208,11 +228,39 @@ for i in ${!DNS[@]}; do
 	fi
 done
 
+for i in ${!PRIVATE_1_DNS[@]}; do
+	PRIVATE_1_DNS_LINES="${PRIVATE_1_DNS_LINES}        - ${PRIVATE_1_DNS[$i]}"
+	if [[ $(($i + 1)) -ne ${#PRIVATE_1_DNS[@]} ]]; then
+		PRIVATE_1_DNS_LINES+=$'\n'
+	fi
+done
+
+for i in ${!PRIVATE_2_DNS[@]}; do
+	PRIVATE_2_DNS_LINES="${PRIVATE_2_DNS_LINES}        - ${PRIVATE_2_DNS[$i]}"
+	if [[ $(($i + 1)) -ne ${#PRIVATE_2_DNS[@]} ]]; then
+		PRIVATE_2_DNS_LINES+=$'\n'
+	fi
+done
+
 # convert DNSSEARCH array to YAML lines
 for i in ${!DNSSEARCH[@]}; do
         DNSSEARCH_LINES="${DNSSEARCH_LINES}        - ${DNSSEARCH[$i]}"
         if [[ $(($i + 1)) -ne ${#DNSSEARCH[@]} ]]; then
                 DNSSEARCH_LINES+=$'\n'
+        fi
+done
+
+for i in ${!PRIVATE_1_DNSSEARCH[@]}; do
+        PRIVATE_1_DNSSEARCH_LINES="${PRIVATE_1_DNSSEARCH_LINES}        - ${PRIVATE_1_DNSSEARCH[$i]}"
+        if [[ $(($i + 1)) -ne ${#PRIVATE_1_DNSSEARCH[@]} ]]; then
+                PRIVATE_1_DNSSEARCH_LINES+=$'\n'
+        fi
+done
+
+for i in ${!PRIVATE_2_DNSSEARCH[@]}; do
+        PRIVATE_2_DNSSEARCH_LINES="${PRIVATE_2_DNSSEARCH_LINES}        - ${PRIVATE_2_DNSSEARCH[$i]}"
+        if [[ $(($i + 1)) -ne ${#PRIVATE_2_DNSSEARCH[@]} ]]; then
+                PRIVATE_2_DNSSEARCH_LINES+=$'\n'
         fi
 done
 
@@ -235,14 +283,31 @@ if [ -n "${IP6}" ]; then
 EOL
 fi
 
-cat >> $NETWORK_CONFIG_FILE << EOL
+if [ -n "${DNS_LINES}${DNSSEARCH_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
     nameservers:
+EOL
+fi
+
+if [ -n "${DNS_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
       addresses:
 ${DNS_LINES}
+EOL
+fi
+
+if [ -n "${DNSSEARCH_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
       search:
 ${DNSSEARCH_LINES}
+EOL
+fi
+
+if [ -n "${GATEWAY}${GATEWAY6}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
     routes:
 EOL
+fi
 
 if [ -n "${GATEWAY}" ]; then
   cat >> $NETWORK_CONFIG_FILE << EOL
@@ -279,7 +344,27 @@ if [ -n "${PRIVATE_1_IP6}" ]; then
 EOL
 fi
 
-if [ -n "${PRIVATE_1_BRIDGE}" ]; then
+if [ -n "${PRIVATE_1_DNS_LINES}${PRIVATE_1_DNSSEARCH_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+    nameservers:
+EOL
+fi
+
+if [ -n "${PRIVATE_1_DNS_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      addresses:
+${PRIVATE_1_DNS_LINES}
+EOL
+fi
+
+if [ -n "${PRIVATE_1_DNSSEARCH_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      search:
+${PRIVATE_1_DNSSEARCH_LINES}
+EOL
+fi
+
+if [ -n "${PRIVATE_1_GATEWAY}${PRIVATE_1_GATEWAY6}" ]; then
   cat >> $NETWORK_CONFIG_FILE << EOL
     routes:
 EOL
