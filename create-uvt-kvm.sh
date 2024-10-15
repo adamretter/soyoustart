@@ -88,18 +88,38 @@ case $key in
     shift
     shift
     ;;
-    --private-bridge)
-    PRIVATE_BRIDGE="$2"
+    --private-1-bridge)
+    PRIVATE_1_BRIDGE="$2"
     shift
     shift
     ;;
-    --private-ip)
-    PRIVATE_IP="$2"
+    --private-1-ip)
+    PRIVATE_1_IP="$2"
     shift
     shift
     ;;
-    --private-gateway)
-    PRIVATE_GATEWAY="$2"
+    --private-1-ip6)
+    PRIVATE_1_IP6="$2"
+    shift
+    shift
+    ;;
+    --private-1-next-network)
+    PRIVATE_1_NEXT_NETWORK="$2"
+    shift
+    shift
+    ;;
+    --private-1-gateway)
+    PRIVATE_1_GATEWAY="$2"
+    shift
+    shift
+    ;;
+     --private-1-next-network6)
+    PRIVATE_1_NEXT_NETWORK6="$2"
+    shift
+    shift
+    ;;
+    --private-1-gateway6)
+    PRIVATE_1_GATEWAY6="$2"
     shift
     shift
     ;;
@@ -161,53 +181,86 @@ for i in ${!DNSSEARCH[@]}; do
         fi
 done
 
-if [ -n "${PRIVATE_BRIDGE}" ]; then
-        cat > $NETWORK_CONFIG_FILE << EOL
+cat > $NETWORK_CONFIG_FILE << EOL
 version: 2
 ethernets:
   enp1s0:
     addresses:
+EOL
+
+if [ -n "${IP}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
       - ${IP}/32
+EOL
+fi
+
+if [ -n "${IP6}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
       - ${IP6}/128
+EOL
+fi
+
+cat >> $NETWORK_CONFIG_FILE << EOL
     nameservers:
       addresses:
 ${DNS_LINES}
       search:
 ${DNSSEARCH_LINES}
     routes:
+EOL
+
+if [ -n "${GATEWAY}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
       - to: 0.0.0.0/0
         via: ${GATEWAY}
         on-link: true
+EOL
+fi
+
+if [ -n "${GATEWAY6}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
       - to: "::/0"
         via: "${GATEWAY6}"
         on-link: true
+EOL
+fi
+
+if [ -n "${PRIVATE_1_BRIDGE}" ]; then
+        cat >> $NETWORK_CONFIG_FILE << EOL
   enp7s0:
     addresses:
-      - ${PRIVATE_IP}/24
-    routes:
-      - to: 10.0.1.254/32
-        via: ${PRIVATE_GATEWAY}
 EOL
-else
-	cat > $NETWORK_CONFIG_FILE << EOL
-version: 2
-ethernets:
-  enp1s0:
-    addresses:
-      - ${IP}/32
-      - ${IP6}/128
-    nameservers:
-      addresses:
-${DNS_LINES}
-      search:
-${DNSSEARCH_LINES}
+fi
+
+if [ -n "${PRIVATE_1_IP}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      - ${PRIVATE_1_IP}/24
+EOL
+fi
+
+if [ -n "${PRIVATE_1_IP6}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      - ${PRIVATE_1_IP6}/128
+EOL
+fi
+
+if [ -n "${PRIVATE_1_BRIDGE}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
     routes:
-      - to: 0.0.0.0/0
-        via: ${GATEWAY}
-        on-link: true
-      - to: "::/0"
-        via: "${GATEWAY6}"
-        on-link: true
+EOL
+fi
+
+if [ -n "${PRIVATE_1_GATEWAY}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      - to: ${PRIVATE_1_NEXT_NETWORK}
+        via: ${PRIVATE_1_GATEWAY}
+EOL
+fi
+
+if [ -n "${PRIVATE_1_GATEWAY6}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      - to: ${PRIVATE_1_NEXT_NETWORK6}
+        via: ${PRIVATE_1_GATEWAY6}
 EOL
 fi
 
@@ -227,8 +280,8 @@ fi
 # NOTE: uvt-kvm wait does not work with bridge as it cannot detect the IP
 #uvt-kvm wait $HOSTNAME --insecure
 
-if [ -n "${PRIVATE_BRIDGE}" ]; then
-	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_BRIDGE} --model virtio --config --live
+if [ -n "${PRIVATE_1_BRIDGE}" ]; then
+	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_1_BRIDGE} --model virtio --config --live
 fi
 
 if [[ "${AUTOSTART}" -eq "true" ]]; then
