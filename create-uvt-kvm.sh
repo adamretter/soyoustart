@@ -123,6 +123,41 @@ case $key in
     shift
     shift
     ;;
+    --private-2-bridge)
+    PRIVATE_2_BRIDGE="$2"
+    shift
+    shift
+    ;;
+    --private-2-ip)
+    PRIVATE_2_IP="$2"
+    shift
+    shift
+    ;;
+    --private-2-ip6)
+    PRIVATE_2_IP6="$2"
+    shift
+    shift
+    ;;
+    --private-2-next-network)
+    PRIVATE_2_NEXT_NETWORK="$2"
+    shift
+    shift
+    ;;
+    --private-2-gateway)
+    PRIVATE_2_GATEWAY="$2"
+    shift
+    shift
+    ;;
+     --private-2-next-network6)
+    PRIVATE_2_NEXT_NETWORK6="$2"
+    shift
+    shift
+    ;;
+    --private-2-gateway6)
+    PRIVATE_2_GATEWAY6="$2"
+    shift
+    shift
+    ;;
     --auto-start)
     AUTOSTART="true"
     shift
@@ -282,6 +317,10 @@ fi
 
 if [ -n "${PRIVATE_1_BRIDGE}" ]; then
 	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_1_BRIDGE} --model virtio --config --live
+fi
+
+if [ -n "${PRIVATE_2_BRIDGE}" ]; then
+	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_2_BRIDGE} --model virtio --config --live
 fi
 
 if [[ "${AUTOSTART}" -eq "true" ]]; then
