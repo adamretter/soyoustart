@@ -270,6 +270,9 @@ for i in ${!PRIVATE_2_DNSSEARCH[@]}; do
         fi
 done
 
+
+# Bridge Interface
+
 cat > $NETWORK_CONFIG_FILE << EOL
 version: 2
 ethernets:
@@ -331,6 +334,9 @@ if [ -n "${GATEWAY6}" ]; then
 EOL
 fi
 
+
+# Private 1 Bridge Interface
+
 if [ -n "${PRIVATE_1_BRIDGE}" ]; then
         cat >> $NETWORK_CONFIG_FILE << EOL
   enp7s0:
@@ -390,6 +396,68 @@ if [ -n "${PRIVATE_1_GATEWAY6}" ]; then
 EOL
 fi
 
+# Private 2 Bridge Interface
+
+if [ -n "${PRIVATE_2_BRIDGE}" ]; then
+        cat >> $NETWORK_CONFIG_FILE << EOL
+  enp8s0:
+    optional: true
+    addresses:
+EOL
+fi
+
+if [ -n "${PRIVATE_2_IP}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      - ${PRIVATE_2_IP}/24
+EOL
+fi
+
+if [ -n "${PRIVATE_2_IP6}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      - ${PRIVATE_2_IP6}/128
+EOL
+fi
+
+if [ -n "${PRIVATE_2_DNS_LINES}${PRIVATE_2_DNSSEARCH_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+    nameservers:
+EOL
+fi
+
+if [ -n "${PRIVATE_2_DNS_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      addresses:
+${PRIVATE_2_DNS_LINES}
+EOL
+fi
+
+if [ -n "${PRIVATE_2_DNSSEARCH_LINES}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      search:
+${PRIVATE_2_DNSSEARCH_LINES}
+EOL
+fi
+
+if [ -n "${PRIVATE_2_GATEWAY}${PRIVATE_2_GATEWAY6}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+    routes:
+EOL
+fi
+
+if [ -n "${PRIVATE_2_GATEWAY}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      - to: ${PRIVATE_2_NEXT_NETWORK}
+        via: ${PRIVATE_2_GATEWAY}
+EOL
+fi
+
+if [ -n "${PRIVATE_2_GATEWAY6}" ]; then
+  cat >> $NETWORK_CONFIG_FILE << EOL
+      - to: ${PRIVATE_2_NEXT_NETWORK6}
+        via: ${PRIVATE_2_GATEWAY6}
+EOL
+fi
+
 ssh-keygen -b 4096 -C "ubuntu@${HOSTNAME}" -f $SSH_KEY
 chgrp sysops $SSH_KEY $SSH_KEY.pub
 chmod 600 $SSH_KEY
@@ -407,11 +475,11 @@ fi
 #uvt-kvm wait $HOSTNAME --insecure
 
 if [ -n "${PRIVATE_1_BRIDGE}" ]; then
-	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_1_BRIDGE} --model virtio --config --live
+	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_1_BRIDGE} --model virtio --config --persistent --live
 fi
 
 if [ -n "${PRIVATE_2_BRIDGE}" ]; then
-	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_2_BRIDGE} --model virtio --config --live
+	virsh attach-interface --domain ${HOSTNAME} --type bridge --source ${PRIVATE_2_BRIDGE} --model virtio --config
 fi
 
 if [[ "${AUTOSTART}" -eq "true" ]]; then
